@@ -41,3 +41,37 @@ graph.vertices.filter {
 }.collect.foreach {
   case (id, (name, age)) => println(s"$name is $age")
 }
+
+// Display who likes who
+for (triplet <- graph.triplets.collect) {
+  println(s"${triplet.srcAttr._1} likes ${triplet.dstAttr._1}")
+}
+
+// If someone likes someone else more than 5 times than that relationship is getting pretty serious
+// For extra credit, find the lovers.
+for (triplet <- graph.triplets.filter(t => t.attr > 5).collect) {
+  println(s"${triplet.srcAttr._1} loves ${triplet.dstAttr._1}")
+}
+
+// Define a class to more clearly model the user property
+case class User(name: String, age: Int, inDeg: Int, outDeg: Int)
+// Create a user Graph
+val initialUserGraph: Graph[User, Int] = graph.mapVertices{ case (id, (name, age)) => User(name, age, 0, 0) }
+// Fill in the degree information
+val userGraph = initialUserGraph.outerJoinVertices(initialUserGraph.inDegrees) {
+  case (id, u, inDegOpt) => User(u.name, u.age, inDegOpt.getOrElse(0), u.outDeg)
+}.outerJoinVertices(initialUserGraph.outDegrees) {
+  case (id, u, outDegOpt) => User(u.name, u.age, u.inDeg, outDegOpt.getOrElse(0))
+}
+
+// Print the number of people who like each user
+for ((id, property) <- userGraph.vertices.collect) {
+  println(s"User $id is called ${property.name} and is liked by ${property.inDeg} people.")
+}
+
+// Print the names of the users who are liked by the same number of people they like.
+userGraph.vertices.filter {
+  case (id, u) => u.inDeg == u.outDeg
+}.collect.foreach {
+  case (id, property) => println(property.name)
+}
