@@ -1,1 +1,1 @@
-# Spark
+Repository for practicing Spark
