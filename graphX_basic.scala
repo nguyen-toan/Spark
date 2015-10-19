@@ -75,3 +75,46 @@ userGraph.vertices.filter {
 }.collect.foreach {
   case (id, property) => println(property.name)
 }
+
+// Find the oldest follower for each user
+val oldestFollower: VertexRDD[(String, Int)] = userGraph.mapReduceTriplets[(String, Int)](
+  // For each edge send a message to the destination vertex with the attribute of the source vertex
+  edge => Iterator((edge.dstId, (edge.srcAttr.name, edge.srcAttr.age))),
+  // To combine messages take the message for the older follower
+  (a, b) => if (a._2 > b._2) a else b
+  )
+ 
+userGraph.vertices.leftJoin(oldestFollower) {
+  (id, user, optOldestFollower) => optOldestFollower match {
+    case None => s"${user.name} does not have any followers."
+    case Some((name, age)) => s"${name} is the oldest follower of ${user.name}."
+  }
+}.collect.foreach {
+  case (id, str) => println(str)
+}
+
+// Find the average follower age of the followers of each user.
+val averageAge: VertexRDD[Double] = userGraph.mapReduceTriplets[(Int, Double)](
+  // map function returns a tuple of (1, Age)
+  edge => Iterator((edge.dstId, (1, edge.srcAttr.age.toDouble))),
+  // reduce function combines (sumOfFollowers, sumOfAge)
+  (a, b) => ((a._1 + b._1), (a._2 + b._2))
+  ).mapValues((id, p) => p._2 / p._1)
+
+userGraph.vertices.leftJoin(averageAge) { (id, user, optAverageAge) =>
+  optAverageAge match {
+    case None => s"${user.name} does not have any followers."
+    case Some(avgAge) => s"The average age of ${user.name}\'s followers is $avgAge."
+  }
+}.collect.foreach { case (id, str) => println(str) }
+
+// restrict our graph to the users that are 30 or older.
+val olderGraph = userGraph.subgraph(vpred = (id, user) => user.age >= 30)
+
+// compute the connected components
+val cc = olderGraph.connectedComponents
+
+// display the component id of each user:
+olderGraph.vertices.leftJoin(cc.vertices) {
+  case (id, user, comp) => s"${user.name} is in component ${comp.get}"
+}.collect.foreach{ case (id, str) => println(str) }
