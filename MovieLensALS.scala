@@ -1,3 +1,8 @@
+/** This is a tutorial on using MLlib to make personalized movie recommendations on MovieLens data.
+  * 
+  * Reference: http://ampcamp.berkeley.edu/5/exercises/movie-recommendation-with-mllib.html
+  * /
+
 import java.io.File
 
 import scala.io.Source
@@ -25,7 +30,6 @@ object MovieLensALS {
     }
 
     // set up environment
-
     val conf = new SparkConf()
       .setAppName("MovieLensALS")
       .set("spark.executor.memory", "2g")
