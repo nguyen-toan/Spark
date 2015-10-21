@@ -5,6 +5,9 @@
 # Before starting, make sure to install "SparkR" in advance.
 # >library(devtools)
 # >install_github("amplab-extras/SparkR-pkg", subdir="pkg")
+#
+# Data can be downloaded from here:
+#   http://ampcamp.berkeley.edu/5/exercises/getting-started.html
 
 # Load the SparkR library
 library(SparkR)
