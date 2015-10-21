@@ -2,9 +2,9 @@
 # This is a tutorial on using sparkR
 # Reference: http://ampcamp.berkeley.edu/5/exercises/sparkr.html
 #
-# Before starting, make sure to install "SparkR" in advance.
-# >library(devtools)
-# >install_github("amplab-extras/SparkR-pkg", subdir="pkg")
+# Before starting, make sure to install "SparkR" in advance. 
+# Here is a README on building SparkR on Windows:
+#   https://github.com/amplab-extras/SparkR-pkg/blob/master/BUILDING.md
 #
 # Data can be downloaded from here:
 #   http://ampcamp.berkeley.edu/5/exercises/getting-started.html
